@@ -154,4 +154,29 @@ class TestAccountService(TestCase):
     def test_model_account_description(self):
         """It should Read Expected Mode Description"""
         account = AccountFactory()
-        self.assertEqual(account.__repr__, "<Account {account.name} id=[{account.id}]>")
+        descript = account.__repr__()
+        self.assertEqual(descript, f"<Account {account.name} id=[{account.id}]>")
+
+    def test_get_account_list(self):
+        """It should Get a list of Accounts"""
+        response = self.client.get(BASE_URL, content_type="application/json")
+        self.assertNotEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        for _ in range(5):
+            account = AccountFactory()
+            response = self.client.post(BASE_URL, json=account.serialize())
+        response = self.client.get(BASE_URL, content_type="application/json")
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        data = response.get_json()
+        self.assertIsInstance(data, list)
+        count = len(data)
+        self.assertEqual(count, 5)
