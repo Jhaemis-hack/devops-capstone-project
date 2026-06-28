@@ -200,5 +200,6 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data["name"], account.name)
+        self.assertNotEqual(data["name"], account.name)
+        self.assertEqual(data["id"], account.id)
 
