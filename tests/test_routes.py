@@ -143,8 +143,15 @@ class TestAccountService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
         
+    def test_get_account_not_found(self):
+        """It should not Read an Account that is not found"""
         not_found_account = AccountFactory()
         resp = self.client.get(
             f"{BASE_URL}/{not_found_account.id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_model_account_description(self):
+        """It should Read Expected Mode Description"""
+        account = AccountFactory()
+        self.assertEqual(account.__repr__, "<Account {account.name} id=[{account.id}]>")
