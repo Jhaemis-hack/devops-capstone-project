@@ -180,3 +180,26 @@ class TestAccountService(TestCase):
         self.assertIsInstance(data, list)
         count = len(data)
         self.assertEqual(count, 5)
+
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        account = AccountFactory()
+        response = self.client.post(BASE_URL, json=account.serialize())
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+            "Could not create test Account",
+        )
+        new_account = response.get_json()
+        account.id = new_account["id"]
+
+        new_account = AccountFactory()
+        new_account.id = None
+        resp = self.client.put(
+            f"{BASE_URL}/{account.id}", json=new_account.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertNotEqual(data["name"], account.name)
+        self.assertEqual(data["id"], account.id)
+
