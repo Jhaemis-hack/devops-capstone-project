@@ -142,3 +142,9 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
+        
+        not_found_account = AccountFactory()
+        resp = self.client.get(
+            f"{BASE_URL}/{not_found_account.id}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
