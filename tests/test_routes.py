@@ -143,8 +143,40 @@ class TestAccountService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
         
+    def test_get_account_not_found(self):
+        """It should not Read an Account that is not found"""
         not_found_account = AccountFactory()
         resp = self.client.get(
             f"{BASE_URL}/{not_found_account.id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_model_account_description(self):
+        """It should Read Expected Mode Description"""
+        account = AccountFactory()
+        descript = account.__repr__()
+        self.assertEqual(descript, f"<Account {account.name} id=[{account.id}]>")
+
+    def test_get_account_list(self):
+        """It should Get a list of Accounts"""
+        response = self.client.get(BASE_URL, content_type="application/json")
+        self.assertNotEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        for _ in range(5):
+            account = AccountFactory()
+            response = self.client.post(BASE_URL, json=account.serialize())
+        response = self.client.get(BASE_URL, content_type="application/json")
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+        data = response.get_json()
+        self.assertIsInstance(data, list)
+        count = len(data)
+        self.assertEqual(count, 5)
